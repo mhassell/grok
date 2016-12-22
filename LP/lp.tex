@@ -1,0 +1,127 @@
+\documentclass[12pt,english]{article}
+
+\usepackage{graphicx,amsfonts,amssymb,amsmath}
+\usepackage{babel}
+
+
+\setlength{\baselineskip}{19pt}
+
+\setlength{\topmargin}{-0.2in} \setlength{\oddsidemargin}{-0.03in}
+\setlength{\evensidemargin}{-0.03in} \setlength{\leftmargin}{0in}
+\setlength{\textwidth}{6.3in} \setlength{\textheight}{8.75in}
+\setlength{\headheight}{0in} \setlength{\topskip}{0in}
+\def\MLine#1{\par\hspace*{-\leftmargin}\parbox{\textwidth}{\[#1\]}}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{lemma}[theorem]{Lemma}
+
+\title{Linear programming basics}
+\author{M. Hassell}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}\label{sec:1}
+
+This document is a place for me to collect and organize information regarding linear programming and related optimization problems.  My goal is to learn the basics of the theory and algorithms enough to eventually implement some of the basic tools.  I'd ultimately like to progress to problems like integer and mixed integer programming, nonlinear programming, and the like.  Remark: this is a working document and will be updated with new and improved information as I learn more.   I'll include a bibliography at the end for my sources.
+
+\section{Linear programming}\label{sec:2}
+
+A linear programming problem is an optimization problem of the form
+
+\begin{subequations}
+\begin{equation}\label{eq:1.1}
+\max_\mathbf{x} f(\mathbf x)  := \mathbf{c}^T \mathbf{x}
+\end{equation}
+\begin{equation}\label{eq:1.2}
+\text{subject to} \quad \mathbf{A}\mathbf{x} \leq \mathbf{b}, \quad \mathbf{x}\geq 0
+\end{equation}
+\end{subequations}
+
+The inequality constraints in \eqref{eq:1.2} can be understood component-wise, i.e. the first linear inequality constraint would read
+
+$$
+a_{11}x_1 + a_{12}x_2 + \dots + a_{1n}x_n \leq b_1, \quad x_1 \geq 0.
+$$
+
+A plethora of problems can be modeled as linear programming problems.  Here are a few for flavor:
+
+(TBD)
+
+To solve a linear programming problem, we can apply the Simplex Algorithm.   To apply the simplex algorithm, we can convert the LP problem to into augmented (also known as slack) form.  We introduce non-negative slack variables to replace inequality constraints with equality constraints and positivity constraints.   We can rewrite problem \eqref{eq:1.1}-\eqref{eq:1.2} as
+
+\begin{equation}
+\left(
+\begin{array}{ccc}
+1	&	-\mathbf{c}^T 	&	\mathbf{0} 	\\
+0	&	\mathbf{A}		& 	\mathbf{I}
+\end{array}
+\right)
+\left(
+\begin{array}{c}
+z \\
+\mathbf{x} \\
+\mathbf{s}
+\end{array}
+\right)
+= 
+\left(
+\begin{array}{c}
+0 \\
+\mathbf{b}
+\end{array}
+\right),
+\end{equation}
+
+with $\mathbf{x} \geq 0$, $\mathbf{s} \geq 0$.
+
+We now dive into solving a LP problem with the Simplex Method.  First, we need the following
+
+\begin{definition}\label{def:2.1}
+We define the {\it feasible region} to be the set of all points $\mathbf{x}$ such that $\mathbf{A}\mathbf{x} \leq \mathbf{b}$ and $\mathbf{x}_i \geq 0$.  This represents a (possibly unbounded) polytope.  The extreme points of the polytope are characterized as follows.  A point $\mathbf{x} = (x_1, \dots, x_n)$ is an extreme point if and only if the subset of column vectors corresponding to the nonzero entries of $\mathbf{x}$, $x_i \neq 0$, are linearly independent.  Such a point is known as a basic feasible solution.
+\end{definition}
+
+It can be shown (how?) that for a linear program in standard form, if the objective function has a maximum value on the feasible region, then it has this value on at least one of the extreme points.   In addition, we can assume that the rank of the matrix $\mathbf{A}$ is equal to the number of rows of $\mathbf{A}$.  If not, then either $\mathbf{A}$ has redundant equations that can be dropped, or the system is inconsistent and has no solutions.
+
+We can now proceed to solve a true LP problem.  We consider the following:
+$$
+\max z := x_1 +2 x_2 - x_3
+$$
+subject to
+$$
+\begin{array}{c}
+2 x_1 + x_2 + x_3 \leq 14, \\
+4 x_1 + 2 x_2 + 3 x_3 \leq 28, \\
+2 x_1 + 5 x_2 + 5 x_3 \leq 30,
+\end{array}
+$$
+
+and $x_1 \geq 0$, $x_2 \geq 0$, $x_3 \geq 0$. \\
+
+To apply the simplex method, we first convert the problem to augmented/slack form.  It is as follows:
+
+$$
+\max z
+$$
+subject to 
+$$
+\begin{array}{c}
+2 x_1 + x_2 + x_3 + s_1 = 14, \\
+4 x_1 + 2 x_2 + 3 x_3 + s_2 = 28, \\
+2 x_1 + 5 x_2 + 5 x_3 + s_3 = 30,
+\end{array}
+$$
+and $x_i, ~ s_i \geq 0$ for $i=1, ~2, ~3.$ \\
+
+We then form the simplex tableu, which has the following form
+
+\section{A little bit of theory}
+
+It can be shown (reference?) that all linear programs fall into one of three categories: inconsistent, unbounded, and solvable.  We say a linear program is inconsistent if two or more of the inequality constraints are mutually exclusive, e.g. $x_1 \geq 0$ and $2 x_1 \leq 0$.  In this case, there is clearly no solution to the problem.   In the second case, the linear inequality constraints define an unbounded region in Euclidean space and the objective function is also unbounded in the direction that the polytope is unbounded.  There is clearly no maximum, since moving in the unbounded direction will increase the objective function without bound.  Finally, as long as we have a bounded polytope, we can maximize the objective function. \\
+
+
+
+\end{document}
