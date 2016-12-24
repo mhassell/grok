@@ -2,6 +2,7 @@
 
 \usepackage{graphicx,amsfonts,amssymb,amsmath}
 \usepackage{babel}
+\usepackage{color}
 
 
 \setlength{\baselineskip}{19pt}
@@ -26,7 +27,7 @@
 
 \section{Introduction}\label{sec:1}
 
-This document is a place for me to collect and organize information regarding linear programming and related optimization problems.  My goal is to learn the basics of the theory and algorithms enough to eventually implement some of the basic tools.  I'd ultimately like to progress to problems like integer and mixed integer programming, nonlinear programming, and the like.  Remark: this is a working document and will be updated with new and improved information as I learn more.   I'll include a bibliography at the end for my sources.
+This document is a place for me to collect and organize information regarding linear programming and related optimization problems.  My goal is to learn the basics of the theory and algorithms enough to eventually implement some of the basic tools.  I'd ultimately like to progress to problems like integer and mixed integer programming, nonlinear programming, and the like.  Remark: this is a working document and will be updated with new and improved information as I learn more.   I'll include a bibliography at the end for my sources.   I may or may not cite my sources inline, since some of this material will be from Wikipedia (okay, a lot of it will be from Wikipedia), but then some of it will come about as I start to understand the problem from various angles.   And some of it will come from various books and internet sources.  Anything included verbatim that isn't ``common knowledge" will be cited.  Also, if anyone reading this finds any errors or typos, a message would be much appreciated.
 
 \section{Linear programming}\label{sec:2}
 
@@ -76,7 +77,7 @@ z \\
 \right),
 \end{equation}
 
-with $\mathbf{x} \geq 0$, $\mathbf{s} \geq 0$.
+with $\mathbf{x} \geq 0$, $\mathbf{s} \geq 0$.  Geometrically, this transition from inequality constraints to equality constraints pushes the region of interest from the interior and boundary of the polytope to only it's surface.\\
 
 We now dive into solving a LP problem with the Simplex Method.  First, we need the following
 
@@ -84,9 +85,9 @@ We now dive into solving a LP problem with the Simplex Method.  First, we need t
 We define the {\it feasible region} to be the set of all points $\mathbf{x}$ such that $\mathbf{A}\mathbf{x} \leq \mathbf{b}$ and $\mathbf{x}_i \geq 0$.  This represents a (possibly unbounded) polytope.  The extreme points of the polytope are characterized as follows.  A point $\mathbf{x} = (x_1, \dots, x_n)$ is an extreme point if and only if the subset of column vectors corresponding to the nonzero entries of $\mathbf{x}$, $x_i \neq 0$, are linearly independent.  Such a point is known as a basic feasible solution.
 \end{definition}
 
-It can be shown (how?) that for a linear program in standard form, if the objective function has a maximum value on the feasible region, then it has this value on at least one of the extreme points.   In addition, we can assume that the rank of the matrix $\mathbf{A}$ is equal to the number of rows of $\mathbf{A}$.  If not, then either $\mathbf{A}$ has redundant equations that can be dropped, or the system is inconsistent and has no solutions.
+It can be shown (how?) that for a linear program in standard form, if the objective function has a maximum value on the feasible region, then it has this value on at least one of the extreme points.   In addition, we can assume that the rank of the matrix $\mathbf{A}$ is equal to the number of rows of $\mathbf{A}$.  If not, then either $\mathbf{A}$ has redundant equations that can be dropped, or the system is inconsistent and has no solutions.\\
 
-We can now proceed to solve a true LP problem.  We consider the following:
+We can now proceed to solve a true LP problem, pulled directly from \cite{}.  We consider the following:
 $$
 \max z := x_1 +2 x_2 - x_3
 $$
@@ -118,10 +119,83 @@ and $x_i, ~ s_i \geq 0$ for $i=1, ~2, ~3.$ \\
 
 We then form the simplex tableu, which has the following form
 
+\begin{equation}\label{eq:1.3}
+\begin{array}{cccccc|c}
+2 	&	1	& 	1 	& 	1	& 	0	&	0	&	14 \\
+4	&	2	& 	3	&	0	&	1	&	0	&	28 \\
+2	&	5	&	5	&	0	&	0	& 	1	& 	30 \\
+\hline
+-1	& 	-2	&	1	& 	0	&	0	&	0	&	0.
+\end{array}
+\end{equation}
+
+Before we proceed further, let's pick apart some of the structure in this object.  The first three columns contain the original coefficients from the linear inequality constraints.  Essentially, we've copied $\mathbf{A}$ into this position.  The next three columns are the identity matrix $\mathbf{I}_3$, corresponding to the slack variables $s_i$, $i=1, 2, 3.$  The rightmost column contains the constraints from the $\mathbf{b}$ vector.  The bottom row contains in the first three columns the negative of the gradient of the objective function $z$.  The last row is called the indicator row.   What we do next feels somewhat like a combination of Gaussian elimination and gradient descent.  We start with the column containing the most negative coefficient in the last row.  In this case, the most negative coefficient is $-2$ in the second column.  This is referred to as the pivot column.   We form the quotients of elements in the last column with the elements in the corresponding row of the pivot column.  In this case, the pivot column is $[1 ~2 ~5]^T$, so we form the quotients $14/1$, $28/2$, and $30/5$, akin to the Matlab operation $[14 ~28 ~30]./[1 ~2 ~5]$.  From this list, we pick the smallest non-negative quotient (what does this correspond to geometrically?)  In this instance, the smallest non-negative quotient is $30/5 = 6$ in the last row.   We then divide the entire pivot row by $5$, and arrive at the simplex tableu
+
+\begin{equation}
+\begin{array}{cccccc|c}
+2 	&	1	& 	1 	& 	1	& 	0	&	0	&	14 \\
+4	&	2	& 	3	&	0	&	1	&	0	&	28 \\
+2/5	&	1	&	1	&	0	&	0	& 	1/5	& 	6  \\
+\hline
+-1	& 	-2	&	1	& 	0	&	0	&	0	&	0.
+\end{array}
+\end{equation}
+
+We now proceed as we would in Gaussian elimination and use elementary row operations to zero out the entries in the first two rows of the simplex tableu.   Upon performing elementary row operations (EROs) to clear the second column out, the simplex tableu has the following entries
+
+\begin{equation}
+\begin{array}{cccccc|c}
+8/5 	&	0	&	0	&	1	&	0	&	-1/5 	&	8 \\
+16/5	&	0	&	1	&	0	&	1	&	-2/5	&	16 \\
+2/5	&	1	&	1	&	0	&	0	&	1/5	&	6 \\
+\hline
+-1/5	&	0	&	3	&	0	&	0	&	2/5	&	12.
+\end{array}
+\end{equation}
+
+We now look at our indicator row again, and see that the most negative entry is $-1/5$.  Our pivot column will be the first column.  We form the quotients between the pivot column and the last column to find a tie: $8/(8/5) = 5$, $16/(16/5) = 5$, and $6/(2/5)=15$.  We can choose either the first or second row without a problem.  For this exercise, we take the middle row.   Row reducing as before gives us the new tableu
+
+\begin{equation}
+\begin{array}{cccccc|c}
+0 	&	0	&	-1/2	&	1	&	-1/2	&	0 	&	0 \\
+1	&	0	&	5/16	&	0	&	5/16	&	-1/8	&	5 \\
+0	&	1	&	7/8	&	0	&	-1/8	&	1/4	&	4 \\
+\hline
+0	&	0	&   49/16  &	0	&	1/16	&	3/8	&	13.
+\end{array}
+\end{equation}
+
+Our indicator row now has all positive entries, so there are no more ascent directions, so we are done.  We then read off the solution as follows:
+
+\begin{equation}
+\begin{array}{cccccc|c}
+\textcolor{red}{x_1}   &     \textcolor{red}{x_2} 	& \textcolor{red}{x_3} & \textcolor{red}{s_1}  & \textcolor{red}{s_2} & \textcolor{red}{s_3}   & 	\\
+0 				&	0				&	-1/2	&	\textcolor{red}{1}	&	-1/2	&	0 	&	0 \\
+\textcolor{red}{1}	&	0				&	5/16	&	0				&	5/16	&	-1/8	&	5 \\
+0				&	\textcolor{red}{1}	&	7/8	&	0				&	-1/8	&	1/4	&	4 \\
+\hline
+0				&	0				&   49/16  &	0				&	1/16	&	3/8	&	13.
+\end{array}
+\end{equation}
+
+The columns that have been reduced to the identity matrix (marked in red) correspond to the variables we have effectively solved for.  We have $x_1 = 5$, $x_2 = 4$, and $s_1 = 0$.  We can pull the last quantity, $s_1,$ back into the original variables by solving to find that $x_3 = 0$.  The value of the objective function is given in the bottom right corner.  In this case, it has the maximum value $z = 13$.  The remaining variables (corresponding to non-identity columns) are all zero.
+
 \section{A little bit of theory}
 
 It can be shown (reference?) that all linear programs fall into one of three categories: inconsistent, unbounded, and solvable.  We say a linear program is inconsistent if two or more of the inequality constraints are mutually exclusive, e.g. $x_1 \geq 0$ and $2 x_1 \leq 0$.  In this case, there is clearly no solution to the problem.   In the second case, the linear inequality constraints define an unbounded region in Euclidean space and the objective function is also unbounded in the direction that the polytope is unbounded.  There is clearly no maximum, since moving in the unbounded direction will increase the objective function without bound.  Finally, as long as we have a bounded polytope, we can maximize the objective function. \\
 
+\section{Geometric interpretation}
 
+Include a 2d example solved by hand to make the geometric aspect clear.  Use TikZ to show the pictures.   Include inconsistent examples and unbounded examples.  Include unbounded examples where there is a solution as well as when there isn't a solution (these are easy to cook up).
+
+\section{Solvability}
+
+\section{Modeling problems as LP problems}
+
+\section{Variations on LP (integer and mixed integer programming)}
+
+\section{References}
+
+(TBD)
 
 \end{document}

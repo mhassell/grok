@@ -21,3 +21,5 @@ Future grok projects:
 5. Threading and async programming
 
 6. Network programming (at least the basics)
+
+7. Geometric interpretation of Gaussian elimination (probably not enough for it's own thing, but super important for LP).
