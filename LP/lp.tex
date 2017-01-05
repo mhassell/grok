@@ -3,6 +3,7 @@
 \usepackage{graphicx,amsfonts,amssymb,amsmath}
 \usepackage{babel}
 \usepackage{color}
+\usepackage{listings}
 
 
 \setlength{\baselineskip}{19pt}
@@ -180,6 +181,109 @@ Our indicator row now has all positive entries, so there are no more ascent dire
 
 The columns that have been reduced to the identity matrix (marked in red) correspond to the variables we have effectively solved for.  We have $x_1 = 5$, $x_2 = 4$, and $s_1 = 0$.  We can pull the last quantity, $s_1,$ back into the original variables by solving to find that $x_3 = 0$.  The value of the objective function is given in the bottom right corner.  In this case, it has the maximum value $z = 13$.  The remaining variables (corresponding to non-identity columns) are all zero.
 
+\section{Solving LP problems in Python}
+
+For now, we'll jump into using SciPy to solve some linear programs.   The LP solvers are in the module \texttt{scipy.optimize.linprog}.   The problem is as follows:
+
+$$
+\begin{array}{lc}
+\text{minimize} & \qquad \mathbf{c}^T \mathbf{x} \\
+\text{subject to} 
+& \mathbf{A}_{ub} \mathbf{x} \leq \mathbf{b}_{ub}  \\
+& \mathbf{A}_{eq} \mathbf{x} = \mathbf{b}_{eq}.
+\end{array}
+$$
+
+The example problem from the documentation is quoted below \cite{}.
+
+
+$$
+\text{minimize} \qquad -x_0 + 4x_1
+$$
+$$
+\text{subject to}
+\left(
+\begin{array}{cc}
+-3 & 1 \\
+1 & 2 
+\end{array}
+\right)
+\left(
+\begin{array}{c}
+x_0 \\
+x_1
+\end{array}
+\right)
+\leq 
+\left(
+\begin{array}{c}
+6 \\
+4
+\end{array}
+\right)
+$$
+$$
+ x_0 \in \mathbb{R}, x_1 \geq -3.
+$$
+
+\noindent This is input to SciPy as follows:
+
+\begin{lstlisting}
+from scipy.optimize import linprog
+
+c = [-1,4]
+A=[[-3,1],[1,2]]
+b =[6,4]
+x0_bounds = (None, None)
+x1_bounds = (-3, None)
+
+res = linprog(c, A_ub=A, b_ub=b, 
+	bounds=(x0_bounds, x1_bounds), options={``disp":True})
+	
+print(res)
+
+\end{lstlisting}
+
+The method works and returns the minimum value of the objective function, as well as the slack variables and the values of $\mathbf{x}$ that minimize the objective function.  There are some other interesting cases to test: when we have an empty or degenerate feasible region, when the feasible region is (partially) unbounded but the objective decreases in the bounded direction (there is therefore a minimum), the feasible region is unbounded and the objective function decreases in the direction of unbounded-ness, the feasible region is bounded and there is a minimizing segment (there isn't a unique minimizer), and finally the region is unbounded in one direction, but the objective attains a minimum along a ray (there is a ray's worth of minimizers).  We consider these cases below.
+
+\subsection*{Case 1: Degenerate feasible region}
+
+Consider the following linear program:
+
+$$
+\text{minimize} -x_0 + 2x_1
+$$
+$$
+\text{subject to}
+$$
+$$
+\left(
+\begin{array}{cc}
+1	&	-1 	\\
+-1 	&	1     	\\
+\end{array}
+\right)
+\left(
+\begin{array}{c}
+x_0 \\
+x_1
+\end{array}
+\right)
+\leq
+\left(
+\begin{array}{c}
+0 \\
+0
+\end{array}
+\right),
+$$
+$$
+x_0, x_1 \geq 0.
+$$
+
+This corresponds to a degenerate case (the feasible region is a single point).  The simplex algorithm from SciPy returns the single feasible point as the solution, which is the origin.
+
+
 \section{A little bit of theory}
 
 It can be shown (reference?) that all linear programs fall into one of three categories: inconsistent, unbounded, and solvable.  We say a linear program is inconsistent if two or more of the inequality constraints are mutually exclusive, e.g. $x_1 \geq 0$ and $2 x_1 \leq 0$.  In this case, there is clearly no solution to the problem.   In the second case, the linear inequality constraints define an unbounded region in Euclidean space and the objective function is also unbounded in the direction that the polytope is unbounded.  There is clearly no maximum, since moving in the unbounded direction will increase the objective function without bound.  Finally, as long as we have a bounded polytope, we can maximize the objective function. \\
@@ -194,8 +298,7 @@ Include a 2d example solved by hand to make the geometric aspect clear.  Use Tik
 
 \section{Variations on LP (integer and mixed integer programming)}
 
-\section{References}
-
-(TBD)
+\bibliography{bibliography}{}
+\bibliographystyle{plain}
 
 \end{document}
