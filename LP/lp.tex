@@ -19,7 +19,7 @@
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{lemma}[theorem]{Lemma}
 
-\title{Linear programming basics}
+\title{Linear programming basics (draft)}
 \author{M. Hassell}
 
 \begin{document}
@@ -28,7 +28,7 @@
 
 \section{Introduction}\label{sec:1}
 
-This document is a place for me to collect and organize information regarding linear programming and related optimization problems.  My goal is to learn the basics of the theory and algorithms enough to eventually implement some of the basic tools.  I'd ultimately like to progress to problems like integer and mixed integer programming, nonlinear programming, and the like.  Remark: this is a working document and will be updated with new and improved information as I learn more.   I'll include a bibliography at the end for my sources.   I may or may not cite my sources inline, since some of this material will be from Wikipedia (okay, a lot of it will be from Wikipedia), but then some of it will come about as I start to understand the problem from various angles.   And some of it will come from various books and internet sources.  Anything included verbatim that isn't ``common knowledge" will be cited.  Also, if anyone reading this finds any errors or typos, a message would be much appreciated.
+This document is a place for me to collect and organize information regarding linear programming and related optimization problems.  My goal is to learn the basics of the theory and algorithms enough to eventually implement some of the basic tools.  I'd ultimately like to progress to problems like integer and mixed integer programming, nonlinear programming, and the like.  Remark: this is a working document and will be updated with new and improved information as I learn more.   I'll include a bibliography at the end for my sources.   I may or may not cite my sources inline, since some of this material will be from Wikipedia (okay, a lot of it will be from Wikipedia), but then some of it will come about as I start to understand the problem from various angles, and some of it will come from various books and internet sources.  Anything included verbatim that isn't ``common knowledge" will be cited.  Also, if anyone reading this finds any errors or typos, a message would be much appreciated.
 
 \section{Linear programming}\label{sec:2}
 
@@ -48,6 +48,8 @@ The inequality constraints in \eqref{eq:1.2} can be understood component-wise, i
 $$
 a_{11}x_1 + a_{12}x_2 + \dots + a_{1n}x_n \leq b_1, \quad x_1 \geq 0.
 $$
+
+At the moment, I will not be very strict with whether or not we seek to maximize or minimize the objective function.  The key points can be changed between the context of minimization and maximization by simply negative the objective function.
 
 A plethora of problems can be modeled as linear programming problems.  Here are a few for flavor:
 
@@ -80,13 +82,31 @@ z \\
 
 with $\mathbf{x} \geq 0$, $\mathbf{s} \geq 0$.  Geometrically, this transition from inequality constraints to equality constraints pushes the region of interest from the interior and boundary of the polytope to only it's surface.\\
 
-We now dive into solving a LP problem with the Simplex Method.  First, we need the following
+We now dive into solving a LP problem with the Simplex Method.   First, we discuss the notion of basic feasible solutions.   If we can write our matrix as $\mathbf{A} = [\mathbf{B}~ \mathbf{N}]$ where $\mathbf{B}$ is an invertible $m \times m$ matrix, and $\mathbf{B}$ is an $m \times (n-m)$ matrix.  The solution $\mathbf{x} = \left[\begin{array}{c} \mathbf{x}_B \\ \mathbf{x}_N \end{array}\right]$ where 
+$$
+\mathbf{x}_B = \mathbf{B}^{-1} \mathbf{b}
+$$
+and
+$$
+\mathbf{x}_N = \mathbf{0}
+$$
+is called a basic solution of the system.  Moreover, if $\mathbf{x}_B >0$, then we say that it is a basic feasible solution.  This corresponds to a an extreme point (vertex) of the simplex under consideration.  We will refer to the matrix $\mathbf{B}$ as a basic matrix, or more simply, as a basis (in the vector space sense).  Note that in general there can be several ways to construct a basic solution.  As long as we can extract a matrix of full column rank from the matrix $\mathbf{A}$, we can find a basic solution.   \\
 
-\begin{definition}\label{def:2.1}
-We define the {\it feasible region} to be the set of all points $\mathbf{x}$ such that $\mathbf{A}\mathbf{x} \leq \mathbf{b}$ and $\mathbf{x}_i \geq 0$.  This represents a (possibly unbounded) polytope.  The extreme points of the polytope are characterized as follows.  A point $\mathbf{x} = (x_1, \dots, x_n)$ is an extreme point if and only if the subset of column vectors corresponding to the nonzero entries of $\mathbf{x}$, $x_i \neq 0$, are linearly independent.  Such a point is known as a basic feasible solution.
-\end{definition}
 
-It can be shown (how?) that for a linear program in standard form, if the objective function has a maximum value on the feasible region, then it has this value on at least one of the extreme points.   In addition, we can assume that the rank of the matrix $\mathbf{A}$ is equal to the number of rows of $\mathbf{A}$.  If not, then either $\mathbf{A}$ has redundant equations that can be dropped, or the system is inconsistent and has no solutions.\\
+It can be shown (I'll add the proof later) that for a linear program in standard form, if the objective function has a maximum value on the feasible region, then it has this value on at least one of the extreme points.   In addition, we can assume that the rank of the matrix $\mathbf{A}$ is equal to the number of rows of $\mathbf{A}$.  If not, then either $\mathbf{A}$ has redundant equations that can be dropped, or the system is inconsistent and has no solutions.\\
+
+At first glance, it seems we are done.  If our optimization problem has a solution (it is neither inconsistent nor unbounded), then all we need to do is enumerate the vertices of our simplex, evaluate the objective function, and keep the smallest instance.  A back-of-the-envelope calculation yields that the number of vertices of a simplex can grow as quickly as
+$$
+\left(
+\begin{array}{c}
+n\\
+m
+\end{array}
+\right)
+= 
+\frac{n!}{m!(n-m)!}
+$$
+which becomes intractable for even modest $m$ and $n$.  To overcome the combinatorial growth of the number of possible solutions, we turn to the Simplex Method of Dantzig.   This begins by generating an initial feasible solution, and then moving along the edges of the simplex to adjacent vertices corresponding to descent (or ascent) directions of the objective function.  In this way we can stay on the boundary of the simplex and move from extreme point to extreme point and continually push the value of the objective function in the desired direction (up for maximization problems and down for minimization problems).  There are a few computational challenges that can arise, such as stalling and cycling, but I won't discuss them just yet.\\
 
 We can now proceed to solve a true LP problem, pulled directly from \cite{}.  We consider the following:
 $$
@@ -287,6 +307,8 @@ This corresponds to a degenerate case (the feasible region is a single point).  
 \section{A little bit of theory}
 
 It can be shown (reference?) that all linear programs fall into one of three categories: inconsistent, unbounded, and solvable.  We say a linear program is inconsistent if two or more of the inequality constraints are mutually exclusive, e.g. $x_1 \geq 0$ and $2 x_1 \leq 0$.  In this case, there is clearly no solution to the problem.   In the second case, the linear inequality constraints define an unbounded region in Euclidean space and the objective function is also unbounded in the direction that the polytope is unbounded.  There is clearly no maximum, since moving in the unbounded direction will increase the objective function without bound.  Finally, as long as we have a bounded polytope, we can maximize the objective function. \\
+
+From 
 
 \section{Geometric interpretation}
 

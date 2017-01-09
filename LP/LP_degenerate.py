@@ -1,4 +1,4 @@
-# an LP example from the documentation
+# a degenerate linear program
 # last modified: January 4, 2017
 
 from scipy.optimize import linprog
