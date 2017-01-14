@@ -57,7 +57,7 @@ A plethora of problems can be modeled as linear programming problems.  Here are 
 
 To solve a linear programming problem, we can apply the Simplex Algorithm.   To apply the simplex algorithm, we can convert the LP problem to into augmented (also known as slack) form.  We introduce non-negative slack variables to replace inequality constraints with equality constraints and positivity constraints.   We can rewrite problem \eqref{eq:1.1}-\eqref{eq:1.2} as
 
-\begin{equation}
+\begin{equation}\label{eq:2.1}
 \left(
 \begin{array}{ccc}
 1	&	-\mathbf{c}^T 	&	\mathbf{0} 	\\
@@ -80,9 +80,9 @@ z \\
 \right),
 \end{equation}
 
-with $\mathbf{x} \geq 0$, $\mathbf{s} \geq 0$.  Geometrically, this transition from inequality constraints to equality constraints pushes the region of interest from the interior and boundary of the polytope to only it's surface.\\
+with $\mathbf{x} \geq 0$, $\mathbf{s} \geq 0$ \cite{Wiki:LP}.  Geometrically, this transition from inequality constraints to equality constraints pushes the region of interest from the interior and boundary of the polytope to only it's surface.\\
 
-We now dive into solving a LP problem with the Simplex Method.   First, we discuss the notion of basic feasible solutions.   If we can write our matrix as $\mathbf{A} = [\mathbf{B}~ \mathbf{N}]$ where $\mathbf{B}$ is an invertible $m \times m$ matrix, and $\mathbf{B}$ is an $m \times (n-m)$ matrix.  The solution $\mathbf{x} = \left[\begin{array}{c} \mathbf{x}_B \\ \mathbf{x}_N \end{array}\right]$ where 
+To move towards the Simplex Method, we must first discuss the notion of basic feasible solutions.   If we can write our matrix as $\mathbf{A} = [\mathbf{B}~ \mathbf{N}]$ where $\mathbf{B}$ is an invertible $m \times m$ matrix, and $\mathbf{N}$ is an $m \times (n-m)$ matrix.  The variables associated with $\mathbf{B}$ will be called {\it basic} variables, and the variables associated with $\mathbf{N}$ will be called the {\it nonbasic variables}. The solution $\mathbf{x} = \left[\begin{array}{c} \mathbf{x}_B \\ \mathbf{x}_N \end{array}\right]$ where 
 $$
 \mathbf{x}_B = \mathbf{B}^{-1} \mathbf{b}
 $$
@@ -90,7 +90,7 @@ and
 $$
 \mathbf{x}_N = \mathbf{0}
 $$
-is called a basic solution of the system.  Moreover, if $\mathbf{x}_B >0$, then we say that it is a basic feasible solution.  This corresponds to a an extreme point (vertex) of the simplex under consideration.  We will refer to the matrix $\mathbf{B}$ as a basic matrix, or more simply, as a basis (in the vector space sense).  Note that in general there can be several ways to construct a basic solution.  As long as we can extract a matrix of full column rank from the matrix $\mathbf{A}$, we can find a basic solution.   \\
+is called a basic solution of the system \ref{BaJaSh:90}.  Moreover, if $\mathbf{x}_B >0$, then we say that it is a basic feasible solution.  This corresponds to a an extreme point (vertex) of the simplex under consideration.  We will refer to the matrix $\mathbf{B}$ as a basic matrix, or more simply, as a basis (in the vector space sense).  Note that in general there can be several ways to construct a basic solution.  As long as we can extract a matrix of full column rank from the matrix $\mathbf{A}$, we can find a basic solution.   \\
 
 
 It can be shown (I'll add the proof later) that for a linear program in standard form, if the objective function has a maximum value on the feasible region, then it has this value on at least one of the extreme points.   In addition, we can assume that the rank of the matrix $\mathbf{A}$ is equal to the number of rows of $\mathbf{A}$.  If not, then either $\mathbf{A}$ has redundant equations that can be dropped, or the system is inconsistent and has no solutions.\\
@@ -108,7 +108,7 @@ m
 $$
 which becomes intractable for even modest $m$ and $n$.  To overcome the combinatorial growth of the number of possible solutions, we turn to the Simplex Method of Dantzig.   This begins by generating an initial feasible solution, and then moving along the edges of the simplex to adjacent vertices corresponding to descent (or ascent) directions of the objective function.  In this way we can stay on the boundary of the simplex and move from extreme point to extreme point and continually push the value of the objective function in the desired direction (up for maximization problems and down for minimization problems).  There are a few computational challenges that can arise, such as stalling and cycling, but I won't discuss them just yet.\\
 
-We can now proceed to solve a true LP problem, pulled directly from \cite{}.  We consider the following:
+We can now proceed to solve a true LP problem, pulled directly from \cite{UWW}.  We consider the following:
 $$
 \max z := x_1 +2 x_2 - x_3
 $$
@@ -214,7 +214,7 @@ $$
 \end{array}
 $$
 
-The example problem from the documentation is quoted below \cite{}.
+The example problem from the documentation is quoted below \cite{SciPy}.
 
 
 $$
@@ -308,7 +308,60 @@ This corresponds to a degenerate case (the feasible region is a single point).  
 
 It can be shown (reference?) that all linear programs fall into one of three categories: inconsistent, unbounded, and solvable.  We say a linear program is inconsistent if two or more of the inequality constraints are mutually exclusive, e.g. $x_1 \geq 0$ and $2 x_1 \leq 0$.  In this case, there is clearly no solution to the problem.   In the second case, the linear inequality constraints define an unbounded region in Euclidean space and the objective function is also unbounded in the direction that the polytope is unbounded.  There is clearly no maximum, since moving in the unbounded direction will increase the objective function without bound.  Finally, as long as we have a bounded polytope, we can maximize the objective function. \\
 
-From 
+We will make some transformations to the optimization problem to bring it into another form that provides us with a clear algorithm.  Consider \eqref{eq:1.1} and \eqref{eq:1.2}.  We can add slack variables to force the problem to have equality constraints, as in \eqref{eq:2.1}.  We assume this has been done, and now can write the problem (significantly abusing notation) as 
+
+\begin{equation}\label{eq:4.1}
+\begin{array}{l}
+\max ~\mathbf{c}^T \mathbf{x} \\
+\mathbf{A} \mathbf{x} = \mathbf{b} \\
+\mathbf{x} \geq 0.
+\end{array}
+\end{equation}
+
+We then assume we have a basic feasible solution 
+$$
+\mathbf{x} = 
+\left(
+\begin{array}{c}
+\mathbf{B}^{-1}\mathbf{b}  \\
+\mathbf{0} \\
+\end{array}
+\right).
+$$
+The value of the objective function at the BFS is then $\mathbf{c}^T \mathbf{x} = \mathbf{c}_B^T \mathbf{B}^{-1}\mathbf{x}_B =:z_0$, where we've partitioned the cost vector $\mathbf{c}^T = [ \mathbf{c}_B^T ~\mathbf{c}_N^T]$ to correspond to basic and nonbasic variables.  Then we compute
+
+
+\begin{alignat*}{5}
+\mathbf{B}^{-1} \mathbf{b}  	&= \mathbf{B}^{-1}\mathbf{A}\mathbf{x} \\
+						&= \mathbf{B}^{-1}(\mathbf{B}\mathbf{x}_B + \mathbf{N}\mathbf{x}_N) \\
+						&= \mathbf{x}_B + \mathbf{B}^{-1} \mathbf{N} \mathbf{x}_N.
+\end{alignat*}
+
+Denoting the set of indices of nonbasic variables by $R$, we can rearrange the last equality less compactly as
+$$
+\mathbf{x}_B = \mathbf{B}^{-1}\mathbf{b} - \sum_{j \in R} \mathbf{B}^{-1} \mathbf{a}_j x_j.
+$$
+Under the sum, we have written explicitly the columns of the matrix $\mathbf{A}$ that correspond to nonbasic variables, as well as the elements of $\mathbf{x}$ that that correspond to nonbasic variables.  With this in hand, we can see that the objective function can be written as
+\begin{alignat*}{6}
+z 		&= \mathbf{c}^T \mathbf{x} \\
+		&= \mathbf{c}_B^T\mathbf{x}_B + \mathbf{c}_N^T \mathbf{x}_N \\
+		&= \mathbf{c}_B \left( \mathbf{B}^{-1} \mathbf{b} - \sum_{j \in R} \mathbf{B}^{-1} \mathbf{a}_j x_j\right) + \mathbf{c}_N^T \mathbf{x}_N \\
+		&= \mathbf{c}_B^T \mathbf{B}^{-1}\mathbf{b} - \sum_{j \in R} \mathbf{c}_B \mathbf{B}^{-1} \mathbf{a}_j x_j + \sum_{j \in R} c_j x_j \\
+		&= z_0 - \sum_{j \in R} (\mathbf{c}_B^T \mathbf{B}^{-1} \mathbf{a}_j - c_j) x_j \\
+		&= z_0 - \sum_{j \in R} (z_j -c_j)x_j, 
+\end{alignat*}
+where we have defined $z_j := \mathbf{c}_B^T \mathbf{B}^{-1} \mathbf{a}_j $.  In summary, we have cast the LP problem in the following form (in terms of the nonbasic variables):
+
+\begin{subequations}\label{eq:4.3a}
+\begin{equation}
+\min z_0 - \sum_{j \in R} (z_j - c_j) x_j
+\end{equation}
+subject to
+\begin{equation}\label{eq:4.3b}
+\sum_{j \in R} \mathbf{y_j}x_j + \mathbf{x}_B = \overline{\mathbf{b}}, \quad x_j \geq 0, \quad \mathbf{x}_B \geq 0.
+\end{equation}
+\end{subequations}
+For brevity, we have denoted $\mathbf{y}_j := \mathbf{B}^{-1} \mathbf{a}_j$ and $\overline{\mathbf{b}}:= \mathbf{B}^{-1}\mathbf{b}$.  Let's take a moment to inspect what we have here.  In \eqref{eq:4.3a} we can see that we will arrive at a minimum when all of the terms $(z_j - c_j)$ are non-positive.  If there is any $j \in R$ such that $(z_j - c_j) >0$, then we can move in that direction to further decrease the value of the objective function.  We will see how this is done next.
 
 \section{Geometric interpretation}
 
