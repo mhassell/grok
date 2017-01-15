@@ -20,6 +20,8 @@ Future grok projects:
 
 5. Threading and async programming
 
-6. Network programming (at least the basics)
+6. Network programming (at least the basics) NB: this is taking place w/ the help of "Black Hat Python." There's a repo by that name where I'm dropping code for now.
 
-7. Geometric interpretation of Gaussian elimination (probably not enough for it's own thing, but super important for LP).
+7. ML algorithms: Neural networks (various types), regression, classification, etc.  I'll probably use a lot of EoSL.
+
+8. Geometric interpretation of Gaussian elimination (probably not enough for it's own thing, but super important for LP).
