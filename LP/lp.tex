@@ -90,7 +90,7 @@ and
 $$
 \mathbf{x}_N = \mathbf{0}
 $$
-is called a basic solution of the system \ref{BaJaSh:90}.  Moreover, if $\mathbf{x}_B >0$, then we say that it is a basic feasible solution.  This corresponds to a an extreme point (vertex) of the simplex under consideration.  We will refer to the matrix $\mathbf{B}$ as a basic matrix, or more simply, as a basis (in the vector space sense).  Note that in general there can be several ways to construct a basic solution.  As long as we can extract a matrix of full column rank from the matrix $\mathbf{A}$, we can find a basic solution.   \\
+is called a basic solution of the system \cite{BaJaSh:90}.  Moreover, if $\mathbf{x}_B >0$, then we say that it is a basic feasible solution.  This corresponds to a an extreme point (vertex) of the simplex under consideration.  We will refer to the matrix $\mathbf{B}$ as a basic matrix, or more simply, as a basis (in the vector space sense).  Note that in general there can be several ways to construct a basic solution.  As long as we can extract a matrix of full column rank from the matrix $\mathbf{A}$, we can find a basic solution.   \\
 
 
 It can be shown (I'll add the proof later) that for a linear program in standard form, if the objective function has a maximum value on the feasible region, then it has this value on at least one of the extreme points.   In addition, we can assume that the rank of the matrix $\mathbf{A}$ is equal to the number of rows of $\mathbf{A}$.  If not, then either $\mathbf{A}$ has redundant equations that can be dropped, or the system is inconsistent and has no solutions.\\
@@ -150,7 +150,7 @@ We then form the simplex tableu, which has the following form
 \end{array}
 \end{equation}
 
-Before we proceed further, let's pick apart some of the structure in this object.  The first three columns contain the original coefficients from the linear inequality constraints.  Essentially, we've copied $\mathbf{A}$ into this position.  The next three columns are the identity matrix $\mathbf{I}_3$, corresponding to the slack variables $s_i$, $i=1, 2, 3.$  The rightmost column contains the constraints from the $\mathbf{b}$ vector.  The bottom row contains in the first three columns the negative of the gradient of the objective function $z$.  The last row is called the indicator row.   What we do next feels somewhat like a combination of Gaussian elimination and gradient descent.  We start with the column containing the most negative coefficient in the last row.  In this case, the most negative coefficient is $-2$ in the second column.  This is referred to as the pivot column.   We form the quotients of elements in the last column with the elements in the corresponding row of the pivot column.  In this case, the pivot column is $[1 ~2 ~5]^T$, so we form the quotients $14/1$, $28/2$, and $30/5$, akin to the Matlab operation $[14 ~28 ~30]./[1 ~2 ~5]$.  From this list, we pick the smallest non-negative quotient (what does this correspond to geometrically?)  In this instance, the smallest non-negative quotient is $30/5 = 6$ in the last row.   We then divide the entire pivot row by $5$, and arrive at the simplex tableu
+Before we proceed further, let's pick apart some of the structure in this object.  The first three columns contain the original coefficients from the linear inequality constraints.  Essentially, we've copied $\mathbf{A}$ into this position.  The next three columns are the identity matrix $\mathbf{I}_3$, corresponding to the slack variables $s_i$, $i=1, 2, 3.$  The rightmost column contains the constraints from the $\mathbf{b}$ vector.  The bottom row contains in the first three columns the negative of the gradient of the objective function $z$.  The last row is called the indicator row.   What we do next feels somewhat like a combination of Gaussian elimination and gradient descent.  We start with the column containing the most negative coefficient in the last row.  In this case, the most negative coefficient is $-2$ in the second column.  This is referred to as the pivot column.   We form the quotients of elements in the last column with the elements in the corresponding row of the pivot column.  In this case, the pivot column is $[1 ~2 ~5]^T$, so we form the quotients $14/1$, $28/2$, and $30/5$, akin to the Matlab operation $[14 ~28 ~30]./[1 ~2 ~5]$.  From this list, we pick the smallest non-negative quotient.  This corresponds to the maximum distance that we can move the variable under consideration without leaving the feasible region. In this instance, the smallest non-negative quotient is $30/5 = 6$ in the last row.   We then divide the entire pivot row by $5$, and arrive at the simplex tableau
 
 \begin{equation}
 \begin{array}{cccccc|c}
@@ -303,16 +303,80 @@ $$
 
 This corresponds to a degenerate case (the feasible region is a single point).  The simplex algorithm from SciPy returns the single feasible point as the solution, which is the origin.
 
+\subsection*{Case 2: Empty feasible region}
+
+Consider the following linear program:
+$$
+\text{minimize} -x_0 + 2x_1
+$$
+subject to
+$$
+\left(
+\begin{array}{cc}
+1	&	-1	\\
+-1	&	1	
+\end{array}
+\right)
+\left(
+\begin{array}{c}
+x_0 \\
+x_1
+\end{array}
+\right)
+\leq 
+\left(
+\begin{array}{c}
+0 	\\
+-1
+\end{array}
+\right),
+$$
+$$
+x_0,~x_1 \geq 0.
+$$
+This linear program defines the empty region to be points in the $(x_0,x_1)$ plane such that $x_0 \leq x_1$ and simultaneously such that $x_1 \geq x_0 +1$.  These parallel lines never intersect, and there are no points in the plane that satisfy both constraints simultaneously.  The program \texttt{LP\_empty.py} implements this program, and returns an error ``Optimization failed. The problem appears to be unbounded." \\
+
+\subsection*{Case 3: unbounded objective function}
+We tweak our previous program as follows:
+$$
+\text{minimize} ~-x_0 - x_1
+$$
+subject to
+$$
+\left(
+\begin{array}{cc}
+-1	&	1	\\
+1	&	-1	
+\end{array}
+\right)
+\left(
+\begin{array}{c}
+x_0 \\
+x_1
+\end{array}
+\right)
+\leq 
+\left(
+\begin{array}{c}
+1 	\\
+0
+\end{array}
+\right),
+$$
+$$
+x_0,~x_1 \geq 0.
+$$
+We again get a warning that the problem appears to be unbounded.
 
 \section{A little bit of theory}
 
-It can be shown (reference?) that all linear programs fall into one of three categories: inconsistent, unbounded, and solvable.  We say a linear program is inconsistent if two or more of the inequality constraints are mutually exclusive, e.g. $x_1 \geq 0$ and $2 x_1 \leq 0$.  In this case, there is clearly no solution to the problem.   In the second case, the linear inequality constraints define an unbounded region in Euclidean space and the objective function is also unbounded in the direction that the polytope is unbounded.  There is clearly no maximum, since moving in the unbounded direction will increase the objective function without bound.  Finally, as long as we have a bounded polytope, we can maximize the objective function. \\
+It can be shown (reference?) that all linear programs fall into one of three categories: inconsistent, unbounded, and solvable.  We say a linear program is inconsistent if two or more of the inequality constraints are mutually exclusive, e.g. $x_1 \geq 0$ and $2 x_1 \leq 0$.  In this case, there is clearly no solution to the problem.   In the second case, the linear inequality constraints define an unbounded region in Euclidean space and the objective function is also unbounded in the direction that the polytope is unbounded.  There is clearly no maximum, since moving in the unbounded direction will increase the objective function without bound.  Finally, as long as we have a bounded polytope, we can maximize (or minimize) the objective function.  In the next bit, we follow closely the exposition of \cite{BaJaSh:1990} \\
 
 We will make some transformations to the optimization problem to bring it into another form that provides us with a clear algorithm.  Consider \eqref{eq:1.1} and \eqref{eq:1.2}.  We can add slack variables to force the problem to have equality constraints, as in \eqref{eq:2.1}.  We assume this has been done, and now can write the problem (significantly abusing notation) as 
 
 \begin{equation}\label{eq:4.1}
 \begin{array}{l}
-\max ~\mathbf{c}^T \mathbf{x} \\
+\min~\mathbf{c}^T \mathbf{x} \\
 \mathbf{A} \mathbf{x} = \mathbf{b} \\
 \mathbf{x} \geq 0.
 \end{array}
@@ -358,10 +422,67 @@ where we have defined $z_j := \mathbf{c}_B^T \mathbf{B}^{-1} \mathbf{a}_j $.  In
 \end{equation}
 subject to
 \begin{equation}\label{eq:4.3b}
-\sum_{j \in R} \mathbf{y_j}x_j + \mathbf{x}_B = \overline{\mathbf{b}}, \quad x_j \geq 0, \quad \mathbf{x}_B \geq 0.
+\sum_{j \in R} \mathbf{y}_jx_j + \mathbf{x}_B = \overline{\mathbf{b}}, \quad x_j \geq 0, \quad \mathbf{x}_B \geq 0.
 \end{equation}
 \end{subequations}
-For brevity, we have denoted $\mathbf{y}_j := \mathbf{B}^{-1} \mathbf{a}_j$ and $\overline{\mathbf{b}}:= \mathbf{B}^{-1}\mathbf{b}$.  Let's take a moment to inspect what we have here.  In \eqref{eq:4.3a} we can see that we will arrive at a minimum when all of the terms $(z_j - c_j)$ are non-positive.  If there is any $j \in R$ such that $(z_j - c_j) >0$, then we can move in that direction to further decrease the value of the objective function.  We will see how this is done next.
+For brevity, we have denoted $\mathbf{y}_j := \mathbf{B}^{-1} \mathbf{a}_j$ and $\overline{\mathbf{b}}:= \mathbf{B}^{-1}\mathbf{b}$.  Let's take a moment to inspect what we have here.  In \eqref{eq:4.3a} we can see that we will arrive at a minimum when all of the terms $(z_j - c_j)$ are non-positive.  If there is any $j \in R$ such that $(z_j - c_j) >0$, then we can move in that direction to further decrease the value of the objective function.  We will see how this is done next. \\
+
+Suppose that we have some $k \in R$ such that $(z_k - c_k)>0$.  If there are multiple such $k$, we take the value of $k$ corresponding to the {\it most} positive of $(z_j - c_j)$ for $j \in R$.  Freezing the problem at this point and setting all other $x_j = 0$ for $j \in R \setminus \{k\}$, we have the simple problem
+\begin{subequations}
+\begin{equation}\label{eq:4.4}
+\text{minimize} ~ z = z_0 - (z_k - c_k)x_k
+\end{equation}
+subject to 
+\begin{equation}\label{eq:4.5}
+\left(
+\begin{array}{c}
+x_{B_1} \\
+x_{B_2} \\
+\vdots \\
+x_{B_r} \\
+\vdots \\
+x_{B_m}
+\end{array}
+\right)
+=
+\left(
+\begin{array}{c}
+\overline{b}_1 \\
+\overline{b}_2 \\
+\vdots \\
+\overline{b}_r \\
+\vdots \\
+\overline{b}_m
+\end{array}
+\right)
+-
+\left(
+\begin{array}{c}
+y_{1k} \\
+y_{2k} \\
+\vdots  \\
+y_{rk} \\
+\vdots \\
+y_{mk}
+\end{array}
+\right)
+x_k.
+\end{equation}
+\end{subequations}
+
+If we have that $y_{ik} \leq 0$, then $x_{B_i}$ will increase as we increase $x_k$, and so we will not violate the non-negativity constraint on $x_{B_i}$.   On the other hand, if $y_{ik} >0$, then $x_{B_i}$ will decrease as $x_k$ increases.  We do not wish to violate the non-negativity constraints on the elements of $x_B$, and so we can only increase $x_k$ until we have 
+$$
+x_k = \frac{\overline{b}_r}{y_{rk}} \equiv \min_{1 \leq i \leq m} \left\{ \frac{\overline{b}_i}{y_{ik}} ~:~ y_{ik} >0 \right\}.
+$$
+With this choice for $x_k$, we then can update \eqref{eq:4.5} by way of 
+$$
+x_{B_i} = \overline{b}_i - \frac{y_{ik}}{y_{rk}} \overline{b}_r \quad i=1,\dots,m
+$$
+$$
+x_k = \frac{\overline{b}_r}{y_{rk}}.
+$$
+
+Let's put all of this into practice with a problem worked all the way through \cite{BaJaSh:90}
 
 \section{Geometric interpretation}
 
