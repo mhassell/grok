@@ -469,20 +469,152 @@ y_{mk}
 x_k.
 \end{equation}
 \end{subequations}
-
 If we have that $y_{ik} \leq 0$, then $x_{B_i}$ will increase as we increase $x_k$, and so we will not violate the non-negativity constraint on $x_{B_i}$.   On the other hand, if $y_{ik} >0$, then $x_{B_i}$ will decrease as $x_k$ increases.  We do not wish to violate the non-negativity constraints on the elements of $x_B$, and so we can only increase $x_k$ until we have 
 $$
 x_k = \frac{\overline{b}_r}{y_{rk}} \equiv \min_{1 \leq i \leq m} \left\{ \frac{\overline{b}_i}{y_{ik}} ~:~ y_{ik} >0 \right\}.
 $$
 With this choice for $x_k$, we then can update \eqref{eq:4.5} by way of 
-$$
+\begin{subequations}
+\begin{equation}\label{eq:4.6}
 x_{B_i} = \overline{b}_i - \frac{y_{ik}}{y_{rk}} \overline{b}_r \quad i=1,\dots,m
-$$
-$$
+\end{equation}
+\begin{equation}\label{eq:4.7}
 x_k = \frac{\overline{b}_r}{y_{rk}}.
-$$
+\end{equation}
+\end{subequations}
+We see that one nonzero basic variable in the problem, $x_{B_r}$ will drop to zero (this will be referred to as ``leaving the basis") and a new variable ($x_k$) will become nonzero (this is referred to as ``entering the basis").  Once we've updated the variables and objective function using \eqref{eq:4.6} and \eqref{eq:4.7}, we then have new basic variables, and we begin the iteration anew by selecting the columns of $\mathbf{A}$ corresponding to the basic variables that are nonzero, computing the values $\mathbf{y}_j$ for $j\in R$ (where the set $R$ now contains the inactive variables), and so on.   Let's put all of this into practice with a problem worked all the way through \cite{BaJaSh:90}.
 
-Let's put all of this into practice with a problem worked all the way through \cite{BaJaSh:90}
+Consider the optimization problem 
+$$
+\text{minimize}~ x_1 + x_2
+$$
+subject to 
+$$
+\begin{array}{c}
+x_1 + 2x_2 \leq 4 \\
+x_2 \leq 1 \\
+x_1, x_2 \geq 0.
+\end{array}
+$$
+We introduce the slack variables $x_3$ and $x_4$ to convert the inequality constraints into equality constraints:
+$$
+\begin{array}{c}
+x_1 + 2 x_2 + x_3 = 4 \\
+x_2 + x_4 		     =1 \\
+x_1, ~x_2, ~x_3, ~x_4 \geq 0.
+\end{array}
+$$
+Our matrix $\mathbf{A}$ then takes the form
+$$
+\mathbf{A} = 
+\left(
+\begin{array}{cccc}
+1	&	2	& 	1	&	0 	\\
+0	&	1	&	0	&	1	\\
+\end{array}
+\right),
+$$
+the cost vector $\mathbf{c}^T = \left( \mathbf{c}_B, \mathbf{c}_N\right) = (1,1,0,0),$ the constraint vector $\mathbf{b}^T = \left( 4, 1 \right)$, we select the nonbasic columns to be
+$$
+\mathbf{N} = \left( \mathbf{a}_3,~ \mathbf{a}_4\right) =
+\left(
+\begin{array}{cc}
+1	&	0 	\\
+0	&	1	\\
+\end{array}
+\right),
+$$
+and finally the basic columns 
+$$
+\mathbf{B} = \left( \mathbf{a}_1,~ \mathbf{a}_2\right) = 
+\left(
+\begin{array}{cc}
+1	&	2	\\
+0	&	1
+\end{array}
+\right).
+$$
+We can then compute:
+$$
+\begin{aligned}
+&&\mathbf{y}_3 	&= 	\mathbf{B}^{-1} \mathbf{a}_3 	&&= \left(\begin{array}{c} 1 \\ 0 \end{array}\right)	\\
+&&\mathbf{y}_4 	&=	\mathbf{B}^{-1} \mathbf{a}_4 	&&= \left(\begin{array}{c} -2 \\ 1\end{array}\right)	\\
+&&\overline{\mathbf{b}}	&=	\mathbf{B}^{-1} \mathbf{b} &&= \left(\begin{array}{c} 2 \\ 1 \end{array}\right) \\
+&&z_0 &= \mathbf{c}_B^T \overline{\mathbf{b}} &&=3 \\
+&&(z_3 - c_3) &=	\mathbf{c}_B^T \mathbf{y}_3 - c_3 &&=1\\
+&&(z_4 - c_4) &=  \mathbf{c}_B^T \mathbf{y}_4 - c_4 &&=-1.\\
+\end{aligned}
+$$
+Having compiled all of this information, we can then see that our minimization problem is equivalent to
+$$
+\text{min}~ 3-x_3+x_4
+$$
+subject to
+\begin{alignat*}{6}
+x_3 - 2x_4 + x_1 &=2, \\
+x_4 + x_2		   &=1, \\
+x_i \geq 0, ~ i=1,2,3,4.
+\end{alignat*}
+It is interesting to note that at this point, the roles of the basic and slack variables have been reversed.  Note that we haven't changed which are the basic and slack variables however.  Thus, we have still have $R = \{ 3, 4\}$.  Since $(z_3 - c_3) = 1$ is the most positive coefficient in the objective function, we take $k=3$ and perform a simplex iteration.  We perform the quotient test with the entries of $\overline{\mathbf{b}}$ and $\mathbf{y}_3$:
+$$
+\overline{\mathbf{b}}(1) / \mathbf{y}_3(1) = 2
+$$
+and 
+$$
+\overline{\mathbf{b}}(2) / \mathbf{y}_3(2) = \text{undefined},
+$$
+where to avoid double subscripts, I've used Matlab vector accessing notation (my apologies).  Since the smallest (well-defined) ratio value is two, we set $x_3 = 2$ and perform the update
+$$
+\mathbf{x}_B = \overline{\mathbf{b}} - \mathbf{y}_3 x_3,
+$$
+leading to the new point
+$$
+\mathbf{x} = 
+\left(
+\begin{array}{c}
+0 \\
+1 \\
+2 \\
+0
+\end{array}
+\right).
+$$
+Notice how $x_1$ was previously an element of our basis, and is now zeroed out.  Similarly, $x_3$ was previously zero, and is now equal to two.  Thus $x_1$ has left the basis, and $x_3$ has entered the basis.  We also have improved the value of the objective function from three to $3 - (z_3 - c_3) x_3 = 1$.  We are now in a position to perform another iteration of the algorithm.   Now, the set of indices of slack variables is $R = \{ 1, 4\}$, and the basic variables are those that are nonzero: $x_2$ and $x_3$.   We then compute as before the matrices and vectors we need:
+$$
+\mathbf{B} = \left( \mathbf{a}_2,~ \mathbf{a}_3\right) = 
+\left(
+\begin{array}{cc}
+2	&	1	\\
+1	&	0
+\end{array}
+\right),
+$$
+$$
+\mathbf{c}_B^T = \left(1,~0\right)
+$$
+$$
+\begin{aligned}
+&&\mathbf{y}_1 	&= 	\mathbf{B}^{-1} \mathbf{a}_1 	&&= \left(\begin{array}{c} 0 \\ 1 \end{array}\right)	\\
+&&\mathbf{y}_4 	&=	\mathbf{B}^{-1} \mathbf{a}_4 	&&= \left(\begin{array}{c} 1 \\ 0\end{array}\right)	\\
+&&\overline{\mathbf{b}}	&=	\mathbf{B}^{-1} \mathbf{b} &&= \left(\begin{array}{c} 1 \\ 2 \end{array}\right) \\
+&&z_0 & &&= 1 \\
+&&(z_1 - c_1) &=	\mathbf{c}_B^T \mathbf{y}_1 - c_1 &&=-1\\
+&&(z_4 - c_4) &=  \mathbf{c}_B^T \mathbf{y}_4 - c_4 &&=1.\\
+\end{aligned}
+$$
+As before, we see that $(z_4 - c_4)$ is the only positive quantity in the modified objective function.  So we take $k=4$ and perform again the update
+$$
+\mathbf{x}_B = \overline{\mathbf{b}} - 
+\left(
+\begin{array}{c}
+1\\
+0
+\end{array}
+\right) x_4.
+$$
+The quotient test yields that we can take $x_4 =1$ while maintaining our positivity constraints.  Upon performing the update, we see that $x_2$ leaves the basis and $x_4$ entered the basis.  We further decreased the value of the objective function to $1 - (z_4 - c_4)x_4 = 1 - 1 = 0$.  Here we see we can no longer decrease the value of the objective function while maintaining positivity of our variables, so we are done.  Had we attempted to proceed another step, we'd see that the coefficients $(z_4 - c_4)$ and $(z_3 - c_3)$ would both be negative, and thus we would not have any further improvement in the objective function.  In conclusion, we've found that the minimum value of the objective function is zero, corresponding to $x_4 = 1$ and $x_3 = 2$.  In terms of the original variables, this corresponds to $x_1 = 0$ and $x_2 = 0$.
+
+\subsection{Degeneracy and stalling}
 
 \section{Geometric interpretation}
 
@@ -493,6 +625,8 @@ Include a 2d example solved by hand to make the geometric aspect clear.  Use Tik
 \section{Modeling problems as LP problems}
 
 \section{Variations on LP (integer and mixed integer programming)}
+
+Remark: it might make more sense to pull IP and MIP into it's own document later down the line.  Maybe just have a flavor of the problem here, and some examples.  I believe IP and MIP will overwhelm the LP material in this doc.
 
 \bibliography{bibliography}{}
 \bibliographystyle{plain}
