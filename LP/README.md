@@ -13,3 +13,5 @@ TBD:
 5. Discuss duality.
 
 6. Do the KKT conditions apply here at all?
+
+7. Eventually add notes on convex sets and convex analysis.
