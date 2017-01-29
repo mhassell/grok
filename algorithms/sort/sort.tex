@@ -66,7 +66,64 @@ Now we consider the more interesting worst-case performance.  In this case, we n
 
 Here's a thought.  Instead of the summation, which is bothering me, consider this argument:  In the outer loop, we touch every element, for a linear complexity.  Independently, we have that $i$ can range from $1$ up to $j-1$.   The outermost loop touches $n$ elements, while the inner \texttt{while} loop touches up to $j-1$ elements per iteration.  We multiply and get that the complexity is $n(n-1) = \mathcal{O}(n^2)$.  This isn't completely clear just yet, but I think it can get there.
 
+\section{Merge Sort}
 
+Merge sort uses a divide-and-conquer approach to sort an array.  Beginning with an unsorted array, we recursively split it into smaller arrays until at the deepest level we have a number of singleton arrays.  These are all trivially sorted.  We then work back up the recursion by merging the sorted arrays at each level to produce a new sorted array.  The key to merge sort is the merge operation.  The rest of the algorithm falls out once we have the merge tool.  We take as arguments $A$, an array containing two already sorted sequences, and three indices: $p$, $q$, and $r$. The elements of the first sorted sequence are stored in $A[p,q]$, and the second sorted sequence is stored in $A[q+1,r]$.  Let's take a look.
+
+\begin{lstlisting}
+merge(A,p,q,r)
+	n1 = q-p+1
+	n2 = r-q
+	for j=1 to n1
+		L[j] = A[j]
+	for j= 1 to n2
+		R[j] = A[q+j]
+	i=1 // index into L
+	j=1 // index into R
+	for k = p to r
+		if i<n1 and j < n2  // L and R both contain entries
+			if L[i]<R[j] 
+				A[k]=L[i]
+				i++
+			else
+				A[k]=R[j]
+				j++
+		else if i==n1 and j<n2  // L is empty
+			A[k]=R[j]
+			j++
+		else if i<n1 and j==n2 // R is empty
+			A[k]=L[i]
+			i++
+\end{lstlisting}
+
+The authors \cite{CoStRiLe:2001} provide a great analogy with merging two decks of already sorted cards.  With this merge procedure in place, merge sort is trivial:
+
+\begin{lstlisting}
+merge_sort(A,p,r)
+	if p<r
+		q = floor(p+r/2)
+		merge-sort(A,p,q)
+		merge-sort(A,q+1,r)
+		merge(A,p,q,r)
+\end{lstlisting}
+
+We simply take the array we desire to sort, split it in two, and recursively sort each of those sub arrays.  We include the simple check $p<q$ to ensure that we have a non-trivial array. Upon sorting each of the sub arrays recursively, we merge them according to the merge method.  
+
+\subsection{Analysis of merge sort}
+
+To analyze merge sort, we can use a recurrence relation.  We let $T(n)$ denote the running time of merge sort on an algorithm on a problem of size $n$.  We assume that for a small enough problem, we can sort the array in constant time.   Now when we split the problem in two, we have a running time of $2T(n/2)$.  If we suppose that it takes $C(n)$ time to merge the problems generated after sorting sub-problems of size $n$, and $D(n)$ time to divide a problem, then we have as an overall running time for a problem of size $n$ (for $n$ large enough) $2T(n/2) + C(n) + D(n)$.  As a side note, for different divide and conquer algorithms, we can write the running time for a problem of size $n$ as $aT(n/b)$, for positive integers $a$ and $b$.
+
+We now assume that the array to be sorted is a power of two, which allows the array to be cleanly split into two further cleanly divisible sub-arrays.  This assumption doesn't hinder the analysis.  Clearly, the splitting the array in twain takes constant time $\Theta(1)$ since we're only computing the midpoint of the array.  Next, the merge operation takes linear time, so we have that $C(n) = \Theta(n)$.  Thus, we have the following recurrent relation for the complexity of the merge-sort method:
+$$
+T(n) = 
+\left\{
+\begin{array}{cc}
+c				& 	\text{if}~n=1 \\
+2T(n/2) + \Theta(n)	&	\text{if}~n>1.
+\end{array}
+\right.
+$$
+By way of a ``master theorem" that I need to see and prove (!) it can be show that the run time of merge sort is $T(n) = \Theta(n \lg n)$, where $\lg n$ is $\log_2 n$.
 
 \bibliography{/Users/matthewhassell/GitHub/grok/lp/bibliography}{}
 \bibliographystyle{plain}
