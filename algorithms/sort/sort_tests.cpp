@@ -13,6 +13,7 @@ int main(){
 
   std::vector<int> v = {17, 6, 4, 13, 12, 7};
   std::vector<int> w = {8, 22, 43, 9, 16};
+  std::vector<int> x = {9, 63, 12, 16, 11, 105};
 
   insertion_sort(v);
 
@@ -27,6 +28,13 @@ int main(){
   for(int j = 0; j<w.size();j++){
     std::cout << w[j] << "\n";
   }
-  
+
+  merge_sort_truncated(x,0,x.size(),3);
+
+  std::cout << "The sorted vector x contains: " << std::endl;
+  for(int j = 0; j<x.size();j++){
+    std::cout << x[j] << "\n";
+  }
+
   return 0;
 }

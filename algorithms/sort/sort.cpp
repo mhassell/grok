@@ -4,6 +4,41 @@
 #include<math.h>
 #include "sort.h"
 
+// truncated merge sort 
+void merge_sort_truncated(std::vector<int> &v, int p, int r, int k){
+  // merge sort the large chunks
+  if(p-r > k) {
+      int q = floor((p+r)/2);
+      merge_sort_truncated(v,p,q,k);
+      merge_sort_truncated(v,q+1,r,k);
+      merge(v,p,q,r);
+    }
+  else {
+    // use insertion sort on the bottom level
+    insertion_sort_truncated(v,p,r);
+  }
+}
+
+// truncated insertion sort for truncated merge sort (avoids copying)
+void insertion_sort_truncated(std::vector<int> &v, int p, int q){
+  
+  int key;
+  int i;
+
+  for(int j=p; j<q; j++){
+    key = v[j];
+    i = j-1;
+    // keep bumping stuff to the right until we find where we should insert the key
+    while(i>=0 & v[i]>key){
+      v[i+1] = v[i];
+      i--;
+    }
+    // once we've shifted everyone else right, drop the key where it belongs
+    v[i+1] = key;
+  }
+}
+
+// merge method for merge sort
 void merge(std::vector<int> &v, int p, int q, int r){
 
   int n1 = q-p+1;
@@ -44,9 +79,10 @@ void merge(std::vector<int> &v, int p, int q, int r){
   }
 }
 
+// actual merge sort
 void merge_sort(std::vector<int> &v, int p, int r)
 {
-  if(p<r)
+  if(r>p)
     {
       int q = floor((p+r)/2);
       merge_sort(v,p,q);
@@ -55,6 +91,7 @@ void merge_sort(std::vector<int> &v, int p, int r)
     }
 }
 
+// insertion sort
 void insertion_sort(std::vector<int> &v){
   int key;
   int i;
@@ -70,5 +107,4 @@ void insertion_sort(std::vector<int> &v){
     v[i+1] = key;
   }
 }
-
 

@@ -11,4 +11,8 @@ void merge_sort(std::vector<int> &v, int p, int r);
 
 void insertion_sort(std::vector<int> &v);
 
+void merge_sort_truncated(std::vector<int> &v, int p, int r, int k);
+
+void insertion_sort_truncated(std::vector<int> &v, int p, int r);
+
 #endif
