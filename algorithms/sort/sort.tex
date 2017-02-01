@@ -123,7 +123,9 @@ c				& 	\text{if}~n=1 \\
 \end{array}
 \right.
 $$
-By way of a ``master theorem" that I need to see and prove (!) it can be show that the run time of merge sort is $T(n) = \Theta(n \lg n)$, where $\lg n$ is $\log_2 n$.
+By way of a ``master theorem" that I need to see and prove (!) it can be show that the run time of merge sort is $T(n) = \Theta(n \lg n)$, where $\lg n$ is $\log_2 n$.  Remark: I've wondered where the $\ln$ term comes from in the analysis of some algorithms.  In this light, it becomes clear where this transcendental function comes in.   Under the assumption that our input array contains a number of elements that is a power of two, we see that we need to recurse $\lg n$ levels to reach the leaves of the recursion tree.  Since for any $a$ and $b$ we have $\log_b = \Theta(\log_a)$, so the asymptotic bound holds for the natural log as well.  \\
+
+An interesting exercise in the book is to coarsen the leaves of the recursion tree and apply insertion sort at the leaves to achieve a more favorable constant in the asymptotic bound for merge sort.  This is done by fixing a number $k$ such that for arrays of size $k$, we apply insertion sort to sort these small arrays, and then merging them back up the recursion tree.
 
 \bibliography{/Users/matthewhassell/GitHub/grok/lp/bibliography}{}
 \bibliographystyle{plain}
