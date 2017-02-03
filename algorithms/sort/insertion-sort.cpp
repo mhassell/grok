@@ -25,6 +25,9 @@ int main()
   for(int n=0; n<v.size(); n++){
     std::cout << v[n] << "\n";
   }
+
+  return 0;
+
 }
 
 void insertion_sort(std::vector<int> &v){

@@ -16,6 +16,8 @@ int main(){
     std::cout << v[j] << '\n';
   }
 
+  return 0;
+
 }
 
 void merge(std::vector<int> &v, int p, int q, int r){
