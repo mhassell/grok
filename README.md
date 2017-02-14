@@ -6,7 +6,7 @@ So this is long overdue, but I need to get this project rolling.  Grok is where 
 
 Here's a list of current grok projects I'm working on:
 
-1. Linear Programming and it's variants (integer, mixed integer, etc.)
+* 1. Linear Programming (made enough progress for now).
 
 Future grok projects:
 
@@ -25,3 +25,15 @@ Future grok projects:
 7. ML algorithms: Neural networks (various types), regression, classification, etc.  I'll probably use a lot of EoSL.
 
 8. Geometric interpretation of Gaussian elimination (probably not enough for it's own thing, but super important for LP).
+
+9. Data structs and algorithms
+	
+	a. https://en.wikipedia.org/wiki/List_of_data_structures
+
+	b. Make a short summary of the details of each (complexity, uses, examples)
+
+	c. Make a few examples of applications where they could be used.
+	
+	d. Lots of examples with pointers (to structs, arrays of various types, etc)
+
+
