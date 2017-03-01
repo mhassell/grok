@@ -2,11 +2,12 @@
 #include <math.h>
 
 void matrix_multiply_recursive(double *A, double *B, double *C, int n);
+void print_matrix(double *A, int m, int n);
 
 int main(){
 
 	// why does caret not work for exponentiation?!
-	int n = pow(2,4);   // only for powers of two (for now)
+	int n = pow(2,4);   // only for even powers of two (for now)
 
 	double A[n];
 	double B[n];
@@ -14,11 +15,11 @@ int main(){
 
 	for(int i=0; i<n; i++){
 		A[i] = (double) (rand()%100);
-		std::cout<<A[i]<<'\n' << std::endl;
 		B[i] = (double) (rand()%100);
 	}
 
-	matrix_multiply_recursive(A,B,C,n/2);
+	print_matrix(A,sqrt(n),sqrt(n));
+	matrix_multiply_recursive(A,B,C,sqrt(n));
 
 	return 0;
 	
@@ -42,38 +43,61 @@ void matrix_multiply_recursive(double *A, double *B, double *C, int n){
 		// pull out top left corners
 		for(int i=0; i<n/2; i++){
 			for(int j=0; j<n/2; j++){
+				//std::cout << "Top left corner " << std::endl;
 				//std::cout << A[i*n/2+j] << '\n' << std::endl;
-				A11[i*(n/2)+j] = A[i*n/2+j];
-				B11[i*(n/2)+j] = B[i*n/2+j];
+				A11[i*(n/2)+j] = A[i*n+j];
+				B11[i*(n/2)+j] = B[i*n+j];
 			}
-			
 		}
+		std::cout << "Top left corner " << std::endl;
+		print_matrix(A11,sqrt(n),sqrt(n));
 
 		// top right corners
 		for(int i=0; i<n/2; i++){
 			for(int j=n/2; j<n; j++){
-				A12[i*(n/2)+j] = A[i*n/2+j];
-				B12[i*(n/2)+j] = B[i*n/2+j];
+				//std::cout << "Top right corner " << std::endl;
+				//std::cout << A[i*n/2+j] << '\n' << std::endl;
+				A12[(i-1)*(n/2)+j] = A[i*n+j];
+				B12[(i-1)*(n/2)+j] = B[i*n+j];
 			}
 		}
+		std::cout << "Top right corner " << std::endl;
+		print_matrix(A12,sqrt(n),sqrt(n));
 
 		// bottom left corners
 		for(int i=n/2; i<n; i++){
 			for(int j=0; j<n/2; j++){
+				//std::cout << "Bottom left corner " << std::endl;
 				//std::cout << A[i*n+j] << '\n' << std::endl;
 				A21[i*(n/2)+j] = A[i*n+j];
 				B21[i*(n/2)+j] = B[i*n+j];
 			}
 		}
+		std::cout << "Bottom left corner " << std::endl;
+		print_matrix(A21,sqrt(n),sqrt(n));
 
 		// bottom right corner
 		for(int i=n/2; i<n; i++){
 			for(int j=n/2; j<n; j++){
-				std::cout << A[i*n+j] << '\n' << std::endl;
-				A21[i*(n/2)+j] = A[i*n+j];
-				B21[i*(n/2)+j] = B[i*n+j];
+				//std::cout << "Bottom right corner " << std::endl;
+				//std::cout << A[i*n+j] << '\n' << std::endl;
+				A22[(i-1)*(n/2)+j] = A[i*n+j];
+				B22[(i-1)*(n/2)+j] = B[i*n+j];
 			}
 		}
+		std::cout << "Bottom right corner " << std::endl;
+		print_matrix(A22,sqrt(n),sqrt(n));
+	}
+}
+
+void print_matrix(double *A, int m, int n){
+
+	for(int i=0;i<m; i++){
+		std::cout << "Row number " << i << std::endl;
+		for(int j=0; j<n; j++){
+			std::cout << A[i*n+j] << ' ';
+		}
+		std::cout << '\n' << std::endl;
 	}
 
 }
