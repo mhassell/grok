@@ -6,9 +6,9 @@ So this is long overdue, but I need to get this project rolling.  Grok is where 
 
 Here's a list of current grok projects:
 
-* 1. Linear Programming (made enough progress for now).
+*  Linear Programming (made enough progress for now).
 
-* 2. Working through CLRS algorithms book with C++.
+*  Working through CLRS algorithms book with C++.
 
 Future grok projects:
 
