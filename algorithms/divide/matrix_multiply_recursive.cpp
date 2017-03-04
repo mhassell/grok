@@ -3,6 +3,7 @@
 
 void matrix_multiply_recursive(double *A, double *B, double *C, int n);
 void print_matrix(double *A, int m, int n);
+void merge_matrices(double *C11, double *C12, double *C21, double *C22, double *C, int n);
 
 int main(){
 
@@ -41,6 +42,10 @@ void matrix_multiply_recursive(double *A, double *B, double *C, int n){
 		double B12[size];
 		double B21[size];
 		double B22[size];
+		double C11[size];
+		double C12[size];
+		double C21[size];
+		double C22[size];
 
 		// pull out top left corners
 		int k = 0;
@@ -98,9 +103,14 @@ void matrix_multiply_recursive(double *A, double *B, double *C, int n){
 		}
 		//std::cout << "Bottom right corner " << std::endl;
 		//print_matrix(A22,n/2,n/2);
+
+		// now that we've split the matrices up we can multiply
+
 	}
+
 }
 
+// print a matrix nicely-ish
 void print_matrix(double *A, int m, int n){
 
 	for(int i=0;i<m; i++){
@@ -110,5 +120,14 @@ void print_matrix(double *A, int m, int n){
 		}
 		std::cout << '\n' << std::endl;
 	}
+
+}
+
+// merge four matrices into a single larger matrix 
+void merge_matrices(double *C11, double *C12, double *C21, double *C22, double *C, int n){
+
+	//n is the size of C11 (& the other three) (i.e. if it is an 8x8 matrix, n = 8)
+	
+
 
 }
