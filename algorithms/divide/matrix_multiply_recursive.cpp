@@ -8,7 +8,7 @@ void merge_matrices(double *C11, double *C12, double *C21, double *C22, double *
 int main(){
 
 	// why does caret not work for exponentiation?!
-	int n = pow(2,8);   // only for even powers of two (for now)
+	int n = pow(2,4);   // only for powers of two (for now)
 
 	double A[n];
 	double B[n];
@@ -105,7 +105,12 @@ void matrix_multiply_recursive(double *A, double *B, double *C, int n){
 		//print_matrix(A22,n/2,n/2);
 
 		// now that we've split the matrices up we can multiply
+		matrix_multiply_recursive(A11,B11,C11,n/2); // UH OH!
 
+
+		// and now we merge
+		merge_matrices(C11, C12, C21, C22, C, n/2);
+		print_matrix(C,n,n);
 	}
 
 }
@@ -127,7 +132,18 @@ void print_matrix(double *A, int m, int n){
 void merge_matrices(double *C11, double *C12, double *C21, double *C22, double *C, int n){
 
 	//n is the size of C11 (& the other three) (i.e. if it is an 8x8 matrix, n = 8)
-	
-
-
+	//therefore, C will be 2n \times 2n
+ 
+	// Pull C11 into C
+	int k=0;
+	int l;
+	for(int i=0; i<n; i++){
+		l=0;
+		for(int j=0; j<n; j++){
+			std::cout << C11[i*n+j] << std::endl;
+			C[k*(2*n)+l] = C11[i*n+j];
+			l++;
+		}
+		k++;
+	}
 }

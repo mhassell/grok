@@ -59,5 +59,6 @@ $$
 (AB)_{ij} = \sum_{k=1}^n A_{ik}B_{kj}.
 $$
 
+Some comments on my code.  Right now it only works for square matrices that have a number of rows that is a power of two.  I'll put this in the pile of things to improve in a second pass.  Also, it seems that there is a fair amount of effort required on bookkeeping-such as extracting sub matrices of a given larger matrix for applying the recursion, as well as joining the sub matrices together after the recursion.  I'm wondering if there is a cleverer way to do this with only pointers, rather than building matrices and then operating on those (i.e. can we work in-place with the matrices).  I also opted to work with vanilla arrays instead of using the std::array template just to keep up with C++ array functionality.  The decay to a pointer is a bit of a headache, and using std::array would simplify some of the function calls (by reducing the number of arguments).  This may be nice to do as well in a later version.
 
 \end{document}
