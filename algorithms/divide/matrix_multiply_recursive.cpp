@@ -17,11 +17,23 @@ int main(){
 	double C[n];
 
 	for(int i=0; i<n; i++){
+		A[i] = i;
+		B[i] = i+4;
+	}
+
+	/*
+	for(int i=0; i<n; i++){
 		A[i] = (double) (rand()%100);
 		B[i] = (double) (rand()%100);
 	}
+	*/
+
+
+	//print_matrix(A,sqrt(n),sqrt(n));
+	//print_matrix(B,sqrt(n),sqrt(n));
 
 	matrix_multiply_recursive(A,B,C,sqrt(n));
+	print_matrix(C,sqrt(n),sqrt(n));
 
 	return 0;
 	
@@ -112,32 +124,35 @@ void matrix_multiply_recursive(double *A, double *B, double *C, int n){
 		// do C11
 		matrix_multiply_recursive(A11,B11,TMP1,n/2);
 		matrix_multiply_recursive(A12,B21,TMP2,n/2);
-		sum_arrays(TMP1,TMP2,C11,n);
-		zero_array(TMP1,n);
-		zero_array(TMP2,n);
+		sum_arrays(TMP1,TMP2,C11,n/2);
+		zero_array(TMP1,n/2);
+		zero_array(TMP2,n/2);
+
 
 		// C12 
+
 		matrix_multiply_recursive(A11,B12,TMP1,n/2);
 		matrix_multiply_recursive(A12,B22,TMP2,n/2);
-		sum_arrays(TMP1,TMP2,C12,n);
-		zero_array(TMP1,n);
-		zero_array(TMP2,n);
+		sum_arrays(TMP1,TMP2,C12,n/2);
+		zero_array(TMP1,n/2);
+		zero_array(TMP2,n/2);
 
 		// C21
 		matrix_multiply_recursive(A21,B11,TMP1,n/2);
 		matrix_multiply_recursive(A22,B21,TMP2,n/2);
-		sum_arrays(TMP1,TMP2,C21,n);
-		zero_array(TMP1,n);
-		zero_array(TMP2,n);
+		sum_arrays(TMP1,TMP2,C21,n/2);
+		zero_array(TMP1,n/2);
+		zero_array(TMP2,n/2);
 
 		//C22
 		matrix_multiply_recursive(A21,B12,TMP1,n/2);
 		matrix_multiply_recursive(A22,B22,TMP2,n/2);
-		sum_arrays(TMP1,TMP2,C22,n);
+		sum_arrays(TMP1,TMP2,C22,n/2);
+
 
 		// and now we merge
 		merge_matrices(C11, C12, C21, C22, C, n/2);
-		print_matrix(C,n,n);
+		//print_matrix(C,n,n);
 	}
 
 }
@@ -157,6 +172,7 @@ void sum_arrays(double *A, double *B, double *C, int n){
 // print a matrix nicely-ish
 void print_matrix(double *A, int m, int n){
 
+	std::cout << "Matrix: " << std::endl;
 	for(int i=0;i<m; i++){
 		//std::cout << "Row number " << i << std::endl;
 		for(int j=0; j<n; j++){
@@ -175,11 +191,44 @@ void merge_matrices(double *C11, double *C12, double *C21, double *C22, double *
  
 	// Pull C11 into C
 	int k=0;
-	int l;
+	int l=0;
 	for(int i=0; i<n; i++){
 		l=0;
 		for(int j=0; j<n; j++){
-			C[k*(2*n)+l] += C11[i*n+j];
+			C[k*(2*n)+l] = C11[i*n+j];
+			l++;
+		}
+		k++;
+	}
+
+	k=0;
+	// Pull C12 into C
+	for(int i=0; i<n; i++){
+		l=0;
+		for(int j=0; j<n; j++){
+			C[(2*k+1)*n+l] = C12[i*n+j];
+			l++;
+		}
+		k++;
+	}
+
+	k=n;
+	// Pull C21 into C
+	for(int i=0; i<n; i++){
+		l=0;
+		for(int j=0; j<n; j++){
+			C[(2*k)*n+l] = C21[i*n+j];
+			l++;
+		}
+		k++;
+	}
+
+	k=n;
+	// Pull C22 into C
+	for(int i=0; i<n; i++){
+		l=0;
+		for(int j=0; j<n; j++){
+			C[(2*k+1)*n+l] = C22[i*n+j];
 			l++;
 		}
 		k++;
