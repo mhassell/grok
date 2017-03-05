@@ -4,6 +4,8 @@
 void matrix_multiply_recursive(double *A, double *B, double *C, int n);
 void print_matrix(double *A, int m, int n);
 void merge_matrices(double *C11, double *C12, double *C21, double *C22, double *C, int n);
+void zero_array(double *C, int n);
+void sum_arrays(double *A, double *B, double *C, int n);
 
 int main(){
 
@@ -34,6 +36,7 @@ void matrix_multiply_recursive(double *A, double *B, double *C, int n){
 
 		int size = (int) pow(2,(n-1));
 
+		// what a mess
 		double A11[size];
 		double A12[size];
 		double A21[size];
@@ -47,6 +50,16 @@ void matrix_multiply_recursive(double *A, double *B, double *C, int n){
 		double C21[size];
 		double C22[size];
 
+		// not happy about this
+		double TMP1[size]; 
+		double TMP2[size];
+
+		// zero out the C's just to be sure
+		zero_array(C11, size);
+		zero_array(C12, size);
+		zero_array(C21, size);
+		zero_array(C22, size);
+
 		// pull out top left corners
 		int k = 0;
 		int l = 0;
@@ -59,8 +72,6 @@ void matrix_multiply_recursive(double *A, double *B, double *C, int n){
 			}
 			k++;
 		}
-		//std::cout << "Top left corner " << std::endl;
-		//print_matrix(A11, n/2, n/2);
 
 		// top right corners
 		k = 0;
@@ -73,8 +84,6 @@ void matrix_multiply_recursive(double *A, double *B, double *C, int n){
 			}
 			k++;
 		}
-		//std::cout << "Top right corner " << std::endl;
-		//print_matrix(A12,n/2,n/2);
 
 		// bottom left corners
 		k=0;
@@ -87,8 +96,6 @@ void matrix_multiply_recursive(double *A, double *B, double *C, int n){
 			}
 			k++;
 		}
-		//std::cout << "Bottom left corner " << std::endl;
-		//print_matrix(A21,n/2,n/2);
 
 		// bottom right corners
 		k = 0;
@@ -101,16 +108,48 @@ void matrix_multiply_recursive(double *A, double *B, double *C, int n){
 			}
 			k++;
 		}
-		//std::cout << "Bottom right corner " << std::endl;
-		//print_matrix(A22,n/2,n/2);
 
-		// now that we've split the matrices up we can multiply
-		matrix_multiply_recursive(A11,B11,C11,n/2); // UH OH!
+		// do C11
+		matrix_multiply_recursive(A11,B11,TMP1,n/2);
+		matrix_multiply_recursive(A12,B21,TMP2,n/2);
+		sum_arrays(TMP1,TMP2,C11,n);
+		zero_array(TMP1,n);
+		zero_array(TMP2,n);
 
+		// C12 
+		matrix_multiply_recursive(A11,B12,TMP1,n/2);
+		matrix_multiply_recursive(A12,B22,TMP2,n/2);
+		sum_arrays(TMP1,TMP2,C12,n);
+		zero_array(TMP1,n);
+		zero_array(TMP2,n);
+
+		// C21
+		matrix_multiply_recursive(A21,B11,TMP1,n/2);
+		matrix_multiply_recursive(A22,B21,TMP2,n/2);
+		sum_arrays(TMP1,TMP2,C21,n);
+		zero_array(TMP1,n);
+		zero_array(TMP2,n);
+
+		//C22
+		matrix_multiply_recursive(A21,B12,TMP1,n/2);
+		matrix_multiply_recursive(A22,B22,TMP2,n/2);
+		sum_arrays(TMP1,TMP2,C22,n);
 
 		// and now we merge
 		merge_matrices(C11, C12, C21, C22, C, n/2);
 		print_matrix(C,n,n);
+	}
+
+}
+
+void sum_arrays(double *A, double *B, double *C, int n){
+	// the arrays are assumed to be n \times n
+	// Add A and B and store the result in C
+
+	for(int i=0; i<n; i++){
+		for(int j=0; j<n; j++){
+			C[i*n+j] = A[i*n+j]+B[i*n+j];
+		}
 	}
 
 }
@@ -140,10 +179,23 @@ void merge_matrices(double *C11, double *C12, double *C21, double *C22, double *
 	for(int i=0; i<n; i++){
 		l=0;
 		for(int j=0; j<n; j++){
-			std::cout << C11[i*n+j] << std::endl;
-			C[k*(2*n)+l] = C11[i*n+j];
+			C[k*(2*n)+l] += C11[i*n+j];
 			l++;
 		}
 		k++;
 	}
+
+}
+
+void zero_array(double *C, int n){
+	// zeros an n \times n array
+
+	for(int i=0; i<n; i++){
+		for(int j=0; j<n; j++){
+
+			C[i*n+j] = 0;
+
+		}
+	}
+
 }
