@@ -128,9 +128,7 @@ void matrix_multiply_recursive(double *A, double *B, double *C, int n){
 		zero_array(TMP1,n/2);
 		zero_array(TMP2,n/2);
 
-
 		// C12 
-
 		matrix_multiply_recursive(A11,B12,TMP1,n/2);
 		matrix_multiply_recursive(A12,B22,TMP2,n/2);
 		sum_arrays(TMP1,TMP2,C12,n/2);
