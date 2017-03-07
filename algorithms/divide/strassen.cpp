@@ -10,7 +10,30 @@ void strassen(double *A, double *B, double *C, int n);
 
 int main(){
 
+	int n = pow(2,4);   // only for powers of two (for now)
 
+	double A[n];
+	double B[n];
+	double C[n];
+
+	for(int i=0; i<n; i++){
+		A[i] = i;
+		B[i] = i+4;
+	}
+
+	/*
+	for(int i=0; i<n; i++){
+		A[i] = (double) (rand()%100);
+		B[i] = (double) (rand()%100);
+	}
+	*/
+
+
+	print_matrix(A,sqrt(n),sqrt(n));
+	print_matrix(B,sqrt(n),sqrt(n));
+
+	strassen(A,B,C,sqrt(n));
+	print_matrix(C,sqrt(n),sqrt(n));
 
 	return 0;
 
@@ -109,7 +132,20 @@ void strassen(double *A, double *B, double *C, int n){
 		strassen(S9,S10,P7,n/2);
 
 		// oh man! 
-		
+		sum_arrays(P5,P4,TMP1,n/2);
+		diff_arrays(TMP1,P2,TMP2,n/2);
+		sum_arrays(TMP2,P6,C11,n/2); // C11 computed
+		zero_array(TMP1,n/2);
+		zero_array(TMP2,n/2);
+
+		sum_arrays(P1,P2,C12,n/2);
+		sum_arrays(P3,P4,C21,n/2);
+
+		sum_arrays(P5,P1,TMP1,n/2);
+		diff_arrays(TMP1,P3,TMP2,n/2);
+		diff_arrays(TMP2,P7,C22,n/2);
+
+		merge_matrices(C11,C12,C21,C22,C,n/2);
 
 	}
 
@@ -117,7 +153,7 @@ void strassen(double *A, double *B, double *C, int n){
 
 void diff_arrays(double *A, double *B, double *C, int n){
 		// the arrays are assumed to be n \times n
-		// subtract A and B and store the result in C
+		// compute A-B and store the result in C
 
 	for(int i=0; i<n; i++){
 		for(int j=0; j<n; j++){
