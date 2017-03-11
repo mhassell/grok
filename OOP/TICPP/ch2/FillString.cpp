@@ -7,7 +7,7 @@
 int main(){
 	std::ifstream in ("FillString.cpp");
 	std::string s, line;
-	while(std::getline(in, line))
+	while(std::getline(in, line))  // this reads line by line, but removes the \n char
 		s+=line + "\n";
 	std::cout << s << std::endl;
 }
