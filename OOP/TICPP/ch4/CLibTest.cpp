@@ -16,6 +16,9 @@ int main(){
 	for(i=0; i<count(&intStash); i++){
 		add(&intStash,&i);
 	}
+
+	std::cout << "Initialized: "<< count(&intStash) << std::endl;
+
 	for(i=0; i<count(&intStash); i++){
 		std::cout << "fetch(&intStash," << i << ") = " \
 			<< *(int *)fetch(&intStash, i) \
