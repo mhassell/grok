@@ -44,7 +44,7 @@ void inflate(CStash *s, int increase){
 	for(int i = 0; i<oldBytes; i++){
 		b[i] = s->storage[i];
 	}
-	delete [] (s->storage);
+	delete []s->storage;
 	s->storage = b;
 	s->quantity = newQuantity;
 }

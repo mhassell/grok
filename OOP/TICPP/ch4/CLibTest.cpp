@@ -14,7 +14,7 @@ int main(){
 
 	initialize(&intStash, sizeof(int));
 	for(i=0; i<count(&intStash); i++){
-		add(&intStash, &i);
+		add(&intStash,&i);
 	}
 	for(i=0; i<count(&intStash); i++){
 		std::cout << "fetch(&intStash," << i << ") = " \
