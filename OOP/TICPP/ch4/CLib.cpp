@@ -12,8 +12,9 @@ void initialize(CStash* s, int sz){
 }
 
 int add(CStash *s, const void* element){
-	if(s->next >= s->quantity)
+	if(s->next >= s->quantity){
 		inflate(s, increment);
+	}
 	
 	int startBytes = (s->next)*(s->size);
 	unsigned char* e = (unsigned char*) element;
