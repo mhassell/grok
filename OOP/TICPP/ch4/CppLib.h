@@ -14,5 +14,6 @@ struct Stash{ // no typedef!
 	int add(const void* element);
 	void* fetch(int index);
 	void inflate(int increase);
+	int count();
 
-}
+};

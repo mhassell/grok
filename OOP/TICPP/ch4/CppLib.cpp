@@ -2,7 +2,7 @@
 
 #include "CppLib.h"
 #include <iostream>
-#include <assert>
+#include <cassert>
 
 const int increment = 100;
 
@@ -11,7 +11,7 @@ void Stash::initialize(int sz){
 	quantity = 0;
 	storage = 0;
 	next = 0;
-}
+};
 
 int Stash::add(const void* element){
 	if(next>=quantity)
